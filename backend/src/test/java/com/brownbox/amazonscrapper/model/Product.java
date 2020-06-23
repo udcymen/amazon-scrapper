@@ -204,11 +204,11 @@ public class Product extends AuditModel {
         this.security = security;
     }
 
-    public String getVs() {
+    public String getVc() {
         return vs;
     }
 
-    public void setVs(String vs) {
+    public void setVc(String vs) {
         this.vs = vs;
     }
 
