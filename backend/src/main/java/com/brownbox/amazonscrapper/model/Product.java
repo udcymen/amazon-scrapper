@@ -24,8 +24,7 @@ public class Product extends AuditModel {
 
     private String link;
 
-    @Enumerated(EnumType.STRING)
-    private Catergory catergory;
+    private String category;
 
     private String brand;
 
@@ -39,18 +38,17 @@ public class Product extends AuditModel {
 
     private String hhd;
 
-    @Enumerated(EnumType.STRING)
-    private Type type;
+    private String type;
 
     private String model;
 
     private String os;
 
-    private String dvd;
+    private Boolean dvd;
 
-    private String Keyboard;
+    private Boolean backlit;
 
-    private String security;
+    private Boolean security;
 
     private String vc;
 
@@ -58,9 +56,12 @@ public class Product extends AuditModel {
 
     private String sku;
 
-    private String office;
+    private Boolean office;
 
     private String note;
+
+    @Version
+    private short version;
 
     public long getId() {
         return id;
@@ -102,12 +103,12 @@ public class Product extends AuditModel {
         this.link = link;
     }
 
-    public Catergory getCatergory() {
-        return catergory;
+    public String getCategory() {
+        return category;
     }
 
-    public void setCatergory(Catergory catergory) {
-        this.catergory = catergory;
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public String getBrand() {
@@ -182,27 +183,27 @@ public class Product extends AuditModel {
         this.os = os;
     }
 
-    public String isDvd() {
+    public Boolean getDvd() {
         return dvd;
     }
 
-    public void setDvd(String dvd) {
+    public void setDvd(Boolean dvd) {
         this.dvd = dvd;
     }
 
-    public String getKeyboard() {
-        return Keyboard;
+    public Boolean getBacklit() {
+        return backlit;
     }
 
-    public void setKeyboard(String keyboard) {
-        Keyboard = keyboard;
+    public void setBacklit(Boolean backlit) {
+        this.backlit = backlit;
     }
 
-    public String getSecurity() {
+    public Boolean getSecurity() {
         return security;
     }
 
-    public void setSecurity(String security) {
+    public void setSecurity(Boolean security) {
         this.security = security;
     }
 
@@ -230,11 +231,11 @@ public class Product extends AuditModel {
         this.sku = sku;
     }
 
-    public String getOffice() {
+    public Boolean getOffice() {
         return office;
     }
 
-    public void setOffice(String office) {
+    public void setOffice(Boolean office) {
         this.office = office;
     }
 
@@ -244,5 +245,13 @@ public class Product extends AuditModel {
 
     public void setNote(String note) {
         this.note = note;
+    }
+
+    public short getVersion() {
+        return version;
+    }
+
+    public void setVersion(short version) {
+        this.version = version;
     }
 }

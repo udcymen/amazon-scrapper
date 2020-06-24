@@ -10,23 +10,24 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
+@CrossOrigin(origins = "*")
 @RestController
 public class ProductController {
     @Autowired
     private ProductRepository productRepository;
 
     @GetMapping("/products")
-    public Page<Product> getQuestions(Pageable pageable){
+    public Page<Product> getProducts(Pageable pageable){
         return productRepository.findAll(pageable);
     }
 
     @PostMapping("/products")
-    public Product createQuestion(@Valid @RequestBody Product question){
+    public Product createProduct(@Valid @RequestBody Product question){
         return productRepository.save(question);
     }
 
     @PutMapping("/products/{productId}")
-    public Product updateQuestion(@PathVariable long questionId,
+    public Product updateProduct(@PathVariable long questionId,
                                    @Valid @RequestBody Product productRequest){
         return productRepository.findById(questionId)
                 .map(product -> {
@@ -35,7 +36,7 @@ public class ProductController {
                     product.setRank(productRequest.getRank());
                     product.setLink(productRequest.getLink());
                     product.setCreatedAt(productRequest.getCreatedAt());
-                    product.setCatergory(productRequest.getCatergory());
+                    product.setCategory(productRequest.getCategory());
                     product.setBrand(productRequest.getBrand());
                     product.setCpu(productRequest.getCpu());
                     product.setScreen(productRequest.getScreen());
@@ -45,8 +46,8 @@ public class ProductController {
                     product.setType(productRequest.getType());
                     product.setModel(productRequest.getModel());
                     product.setOs(productRequest.getOs());
-                    product.setDvd(productRequest.isDvd());
-                    product.setKeyboard(productRequest.getKeyboard());
+                    product.setDvd(productRequest.getDvd());
+                    product.setBacklit(productRequest.getBacklit());
                     product.setSecurity(productRequest.getSecurity());
                     product.setVc(productRequest.getVc());
                     product.setUpc(productRequest.getUpc());
@@ -54,15 +55,15 @@ public class ProductController {
                     product.setOffice(productRequest.getOffice());
                     product.setNote(productRequest.getNote());
                     return productRepository.save(product);
-                }).orElseThrow(() -> new ResourceNotFoundException("Question not found with id " + questionId));
+                }).orElseThrow(() -> new ResourceNotFoundException("Product not found with id " + questionId));
     }
 
     @DeleteMapping("products/{productId}")
-    public ResponseEntity<?> deleteQuestion(@PathVariable long productId){
+    public ResponseEntity<?> deleteProduct(@PathVariable long productId){
         return productRepository.findById(productId)
-                .map(question -> {
-                    productRepository.delete(question);
+                .map(product -> {
+                    productRepository.delete(product);
                     return ResponseEntity.ok().build();
-                }).orElseThrow(() -> new ResourceNotFoundException("Question not found with id " + productId));
+                }).orElseThrow(() -> new ResourceNotFoundException("Product not found with id " + productId));
     }
 }
