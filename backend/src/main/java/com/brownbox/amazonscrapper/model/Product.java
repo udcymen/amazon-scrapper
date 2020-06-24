@@ -16,10 +16,12 @@ public class Product extends AuditModel {
     )
     private long id;
 
+    @Column(nullable = true)
     private double price;
 
     private String ASIN;
 
+    @Column(nullable = true)
     private int rank;
 
     private String link;
@@ -46,11 +48,11 @@ public class Product extends AuditModel {
 
     private String os;
 
-    private String dvd;
+    private Boolean dvd;
 
-    private String Keyboard;
+    private Boolean backlit;
 
-    private String security;
+    private Boolean security;
 
     private String vc;
 
@@ -58,9 +60,12 @@ public class Product extends AuditModel {
 
     private String sku;
 
-    private String office;
+    private Boolean office;
 
     private String note;
+
+    @Version
+    private short version;
 
     public long getId() {
         return id;
@@ -158,11 +163,11 @@ public class Product extends AuditModel {
         this.hhd = hhd;
     }
 
-    public String getType() {
+    public Type getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(Type type) {
         this.type = type;
     }
 
@@ -182,27 +187,27 @@ public class Product extends AuditModel {
         this.os = os;
     }
 
-    public String isDvd() {
+    public Boolean getDvd() {
         return dvd;
     }
 
-    public void setDvd(String dvd) {
+    public void setDvd(Boolean dvd) {
         this.dvd = dvd;
     }
 
-    public String getKeyboard() {
-        return Keyboard;
+    public Boolean getBacklit() {
+        return backlit;
     }
 
-    public void setKeyboard(String keyboard) {
-        Keyboard = keyboard;
+    public void setBacklit(Boolean backlit) {
+        this.backlit = backlit;
     }
 
-    public String getSecurity() {
+    public Boolean getSecurity() {
         return security;
     }
 
-    public void setSecurity(String security) {
+    public void setSecurity(Boolean security) {
         this.security = security;
     }
 
@@ -230,11 +235,11 @@ public class Product extends AuditModel {
         this.sku = sku;
     }
 
-    public String getOffice() {
+    public Boolean getOffice() {
         return office;
     }
 
-    public void setOffice(String office) {
+    public void setOffice(Boolean office) {
         this.office = office;
     }
 
@@ -244,5 +249,13 @@ public class Product extends AuditModel {
 
     public void setNote(String note) {
         this.note = note;
+    }
+
+    public short getVersion() {
+        return version;
+    }
+
+    public void setVersion(short version) {
+        this.version = version;
     }
 }

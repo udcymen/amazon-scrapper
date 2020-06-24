@@ -7,5 +7,6 @@ public enum Type {
     DESKTOP,
     DESKTOP_AIO,
     DESKTOP_MONITOR,
-    MONITOR
+    MONITOR,
+    OTHER
 }
