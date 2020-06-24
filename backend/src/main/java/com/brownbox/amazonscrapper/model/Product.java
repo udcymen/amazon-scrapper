@@ -4,6 +4,8 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
+@Entity
+@Table(name = "products")
 public class Product extends AuditModel {
     @Id
     @GeneratedValue(generator = "product_generator")
@@ -14,16 +16,15 @@ public class Product extends AuditModel {
     )
     private long id;
 
-    @Column(precision = 2)
     private double price;
 
     private String ASIN;
 
-    @Size(min = 1)
     private int rank;
 
     private String link;
 
+    @Enumerated(EnumType.STRING)
     private Catergory catergory;
 
     private String brand;
@@ -38,19 +39,20 @@ public class Product extends AuditModel {
 
     private String hhd;
 
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private Type type;
 
     private String model;
 
     private String os;
 
-    private boolean dvd;
+    private String dvd;
 
     private String Keyboard;
 
     private String security;
 
-    private String vs;
+    private String vc;
 
     private String upc;
 
@@ -180,11 +182,11 @@ public class Product extends AuditModel {
         this.os = os;
     }
 
-    public boolean isDvd() {
+    public String isDvd() {
         return dvd;
     }
 
-    public void setDvd(boolean dvd) {
+    public void setDvd(String dvd) {
         this.dvd = dvd;
     }
 
@@ -205,11 +207,11 @@ public class Product extends AuditModel {
     }
 
     public String getVc() {
-        return vs;
+        return vc;
     }
 
-    public void setVc(String vs) {
-        this.vs = vs;
+    public void setVc(String vc) {
+        this.vc = vc;
     }
 
     public String getUpc() {

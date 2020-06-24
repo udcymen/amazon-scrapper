@@ -1,18 +1,22 @@
  
-version: "3"
+version: "3.2"
+networks:
+  default:
+    external:
+      name: local_test
 services:
     controller:
         image: congmeng1015/amazonscrapper:latest
         container_name: scrapper_springboot
         ports:
-          - "8000:8000"
+          - "8080:8080"
         volumes:
           - $HOME/docker/volumes/log:/var/log
         depends_on:
           - database
     database:
         image: postgres
-        container_name: scrapper_database
+        container_name: database
         hostname: postgres
         ports:
             - "5432:5432"

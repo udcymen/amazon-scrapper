@@ -104,4 +104,7 @@ dist
 .tern-port
 
 ### Mac shit ###
-*/.DS_Store
+.DS_Store
+
+### Node Modules ###
+*/node_modules
