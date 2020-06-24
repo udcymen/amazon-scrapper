@@ -35,7 +35,7 @@ public class ProductController {
                     product.setRank(productRequest.getRank());
                     product.setLink(productRequest.getLink());
                     product.setCreatedAt(productRequest.getCreatedAt());
-                    product.setCatergory(productRequest.getCatergory());
+                    product.setCategory(productRequest.getCategory());
                     product.setBrand(productRequest.getBrand());
                     product.setCpu(productRequest.getCpu());
                     product.setScreen(productRequest.getScreen());

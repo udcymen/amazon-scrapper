@@ -16,18 +16,15 @@ public class Product extends AuditModel {
     )
     private long id;
 
-    @Column(nullable = true)
     private double price;
 
     private String ASIN;
 
-    @Column(nullable = true)
     private int rank;
 
     private String link;
 
-    @Enumerated(EnumType.STRING)
-    private Catergory catergory;
+    private String category;
 
     private String brand;
 
@@ -41,8 +38,7 @@ public class Product extends AuditModel {
 
     private String hhd;
 
-    @Enumerated(EnumType.STRING)
-    private Type type;
+    private String type;
 
     private String model;
 
@@ -107,12 +103,12 @@ public class Product extends AuditModel {
         this.link = link;
     }
 
-    public Catergory getCatergory() {
-        return catergory;
+    public String getCategory() {
+        return category;
     }
 
-    public void setCatergory(Catergory catergory) {
-        this.catergory = catergory;
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public String getBrand() {
@@ -163,11 +159,11 @@ public class Product extends AuditModel {
         this.hhd = hhd;
     }
 
-    public Type getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(Type type) {
+    public void setType(String type) {
         this.type = type;
     }
 
