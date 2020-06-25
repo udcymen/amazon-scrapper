@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@material-ui/core": "^4.10.2",
     "@material-ui/icons": "^4.9.1",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
@@ -13,9 +14,11 @@
     "@types/react-dom": "^16.9.0",
     "axios": "^0.19.2",
     "bootstrap": "^4.5.0",
+    "material-table": "^1.62.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1",
+    "ts-transformer-keys": "^0.4.2",
     "typescript": "~3.7.2"
   },
   "scripts": {
