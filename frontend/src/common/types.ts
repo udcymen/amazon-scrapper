@@ -26,6 +26,8 @@ export interface Product {
 
 
 export interface TableState {
+    displayProducts: Product[];
     products: Product[];
+    displayColumns: string[];
     columns: string[];
 }

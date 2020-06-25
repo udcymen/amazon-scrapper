@@ -36,3 +36,23 @@
     transform: rotate(360deg);
   }
 }
+
+.tableFixHead { 
+  overflow-y: auto; 
+  height: 100px; 
+}
+
+.tableFixHead thead th { 
+  position: sticky; 
+  top: 0; 
+}
+
+th { 
+  background:#eee; 
+  text-align: center
+}
+
+.scrollit {
+  overflow:scroll;
+  height:100%;
+}

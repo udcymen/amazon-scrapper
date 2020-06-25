@@ -2,19 +2,25 @@ import './App.css';
 import React, { Component } from 'react';
 import axios from 'axios';
 import { Product, TableState } from './common/types';
+import Button from '@material-ui/core/Button';
+import DehazeIcon from '@material-ui/icons/Dehaze';
+import Paper from '@material-ui/core/Paper';
+import Popover from '@material-ui/core/Popover';
 
 class App extends Component {
   state: TableState = {
+    displayProducts: [],
     products: [],
-    columns:[
-      "Asin","Price","Brand","Rank","Display","Ram","CPU","SSD","HHD","Model","Keyboard","DVD","Note","Office","OS","Security","UPC",
-    "SKU","Type","Version","Video Card"]
+    displayColumns: ["Asin", "Price", "Rank", "Brand", "Model"],
+    columns: ["Asin", "Price", "Brand", "Rank", "Display", "Ram", "CPU", "SSD", "HHD", "Model", "Keyboard", "DVD", 
+    "Note", "Office", "OS", "Security", "UPC", "SKU", "Type", "Version", "Video Card"]
   }
 
   getProducts(){
     axios.get('http://localhost:8080/products')
       .then(response => this.setState({
-        products: response.data.content
+        products: response.data.content,
+        displayProducts: response.data.content
         }))
       .catch(err => console.log(err))
   }
@@ -26,84 +32,81 @@ class App extends Component {
   renderTableHeader(){
     return (
       <tr>
-        {this.state.columns.map((column: string, index: number) => {
-          return <th key={index}>{column}</th>
+        {this.state.displayColumns.map((column: string, index: number) => {
+          return <th data-align="center" key={index}>{column}</th>
         })}
       </tr>
     )
   }
 
   renderTableData(){
-    return this.state.products.map((product: Product, index: number) => {
+    return this.state.products.map((product: Product) => {
       return (
-        <tr key={index}>
-          {this.state.columns.map((column: string) => {
+        <tr key={product.id}>
+          {this.state.displayColumns.map((column: string) => {
             switch(column){
               case "Asin":{
-                return <td><a href={product.link}>{product.asin}</a></td>
+                return <td key={column}><a href={product.link}>{product.asin}</a></td>
               }
               case "Price":{
-                return <td>{product.price}</td>
+                return <td key={column}>{product.price}</td>
               }
               case "Brand":{
-                return <td>{product.brand}</td>
+                return <td key={column}>{product.brand}</td>
               }
               case "Rank":{
-                return <td>{product.rank}</td>
+                return <td key={column}>{product.rank}</td>
               }
               case "Display":{
-                return <td>{product.screen}</td>
+                return <td key={column}>{product.screen}</td>
               }
               case "Ram":{
-                return <td>{product.ram}</td>
+                return <td key={column}>{product.ram}</td>
               }
               case "CPU":{
-                return <td>{product.cpu}</td>
+                return <td key={column}>{product.cpu}</td>
               }
               case "SSD":{
-                return <td>{product.ssd}</td>
+                return <td key={column}>{product.ssd}</td>
               }
               case "HHD":{
-                return <td>{product.hhd}</td>
+                return <td key={column}>{product.hhd}</td>
               }
               case "Model":{
-                return <td>{product.model}</td>
+                return <td key={column}>{product.model}</td>
               }
               case "Keyboard":{
-                return <td>{product.backlit}</td>
+                return <td key={column}>{product.backlit}</td>
               }
               case "DVD":{
-                return <td>{product.dvd}</td>
+                return <td key={column}>{product.dvd}</td>
               }
               case "Note":{
-                return <td>{product.note}</td>
+                return <td key={column}>{product.note}</td>
               }
               case "Office":{
-                return <td>{product.office}</td>
+                return <td key={column}>{product.office}</td>
               }
               case "OS":{
-                return <td>{product.os}</td>
+                return <td key={column}>{product.os}</td>
               }
               case "Security":{
-                return <td>{product.security}</td>
+                return <td key={column}>{product.security}</td>
               }
               case "UPC":{
-                return <td>{product.upc}</td>
+                return <td key={column}>{product.upc}</td>
               }
               case "SKU":{
-                return <td>{product.sku}</td>
+                return <td key={column}>{product.sku}</td>
               }
               case "Type":{
-                return <td>{product.type}</td>
+                return <td key={column}>{product.type}</td>
               }
               case "Video Card":{
-                return <td>{product.vc}</td>
+                return <td key={column}>{product.vc}</td>
               }
               case "Version":{
-                return <td>{product.version}</td>
-              }
-              deafult: {
-                return <td></td>
+                return <td key={column}>{product.version}</td>
               }
             }
           })}
@@ -114,16 +117,24 @@ class App extends Component {
 
   render(){
     return (
-      <div>
-        <table className="table table-bordered table-hover table-striped">
-          <thead className="thead-dark">
-            {this.renderTableHeader()}
-          </thead>
-          <tbody>
-            {this.renderTableData()}
-          </tbody>
-        </table>
-      </div>
+      <Paper component="form" className="root">
+        <div>
+        <Button variant="outlined" color="primary">
+          <DehazeIcon/>
+          Columns Options
+        </Button>
+        </div>
+        <div>
+          <table className="table table-hover table-striped tableFixHead">
+            <thead className="thead-dark">
+              {this.renderTableHeader()}
+            </thead>
+            <tbody className="table-bordered scrollit">
+              {this.renderTableData()}
+            </tbody>
+          </table>
+        </div>
+      </Paper>
     )
   }
 }
