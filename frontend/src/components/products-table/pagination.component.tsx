@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-class ColumnOptions extends Component<{ displayColumns: string[] }> {
+class Pagination extends Component {
 
     render(){
         return (
@@ -10,4 +10,4 @@ class ColumnOptions extends Component<{ displayColumns: string[] }> {
     }
 }
 
-export default ColumnOptions;
+export default Pagination;

@@ -16,10 +16,8 @@
     "bootstrap": "^4.5.0",
     "material-table": "^1.62.0",
     "react": "^16.13.1",
-    "react-bootstrap": "^1.0.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1",
-    "ts-transformer-keys": "^0.4.2",
     "typescript": "~3.7.2"
   },
   "scripts": {

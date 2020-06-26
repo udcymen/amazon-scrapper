@@ -1,138 +1,124 @@
 import React, { Component } from 'react';
 import { Product } from '../../common/types';
-import DehazeIcon from '@material-ui/icons/Dehaze';
-import Paper from '@material-ui/core/Paper';
-import ColumnOptions from './column-options-component';
-import { Button, Modal, Form } from 'react-bootstrap';
+import axios from 'axios';
+import ColumnOption from './column-option.component';
+
 
 interface ProductTableState {
-    displayProducts: Product[];
+    products: Product[]
     displayColumns: string[];
-    columns: string[];
     activePage: number;
-    totalPages: number | null;
-    totalItemsCount: number | null;
-    itemsCountPerPage: number | null;
+    totalPages: number;
+    totalItemsCount: number;
+    itemsCountPerPage: number;
     showColumnOptions: boolean;
 }
 
-interface InjectProps {
-    products: Product[];
-}
-
-class ProductsTable extends Component<InjectProps, ProductTableState> {
-
+class ProductsTable extends Component {
     state: ProductTableState = {
-        displayProducts: [],
-        displayColumns: ["Asin", "Price", "Rank", "Brand", "Model"],
-        columns: ["Asin", "Price", "Brand", "Rank", "Display", "Ram", "CPU", "SSD", "HHD", "Model", "Keyboard", "DVD", 
-        "Note", "Office", "OS", "Security", "UPC", "SKU", "Type", "Version", "Video Card"],
-        activePage: 1,
-        totalPages: null,
-        totalItemsCount: null,
-        itemsCountPerPage: null,
+        products: [],
+        displayColumns: ["ASIN", "Price", "Rank", "Brand", "Model"],
+        activePage: 0,
+        totalPages: 0,
+        totalItemsCount: 0,
+        itemsCountPerPage: 20,
         showColumnOptions: false
     }
 
-    onChangeColumns(newColumns: string[]){
-        this.setState({
-            displayColumns: newColumns
-        })
+    fetchProducts(page: number, size: number){
+        axios.get(`http://localhost:8080/products?page=${page}&size=${size}`)
+            .then(response => this.setState({
+                products: response.data.content,
+                totalPages: response.data.totalPages,
+                totalItemsCount: response.data.totalElements,
+                activePage: response.data.number + 1,
+                itemsCountPerPage: response.data.size
+            }))
+            .catch(err => console.log(err))
     }
 
-    onOpenModal(){
-        this.setState({
-            showColumnOptions: !this.state.showColumnOptions
-        })
+
+    componentDidMount() {
+        this.fetchProducts(this.state.activePage, this.state.itemsCountPerPage);
     }
 
-    onCloseModal(){
-        this.setState({
-            showColumnOptions: !this.state.showColumnOptions
-        })
-    }
-
-    onToggleCheckbox(){
-        
-    }
-
-    renderTableHeader(){
+    renderTableHeader() {
         return (
-          <tr>
-            {this.state.displayColumns.map((column: string, index: number) => {
-              return <th data-align="center" key={index}>{column}</th>
-            })}
-          </tr>
+            <tr>
+                {this.state.displayColumns.map((column: string, index: number) => {
+                    return <th data-align="center" key={index}>{column}</th>
+                })}
+            </tr>
         )
     }
 
-    renderTableData(){
-        return this.props.products.map((product: Product) => {
+    renderTableData() {
+        return this.state.products.map((product: Product) => {
             return (
                 <tr key={product.id}>
                     {this.state.displayColumns.map((column: string) => {
-                        switch(column){
-                            case "Asin":{
+                        switch (column) {
+                            case "ASIN": {
                                 return <td key={column}><a href={product.link}>{product.asin}</a></td>
                             }
-                            case "Price":{
+                            case "Price": {
                                 return <td key={column}>{product.price}</td>
                             }
-                            case "Brand":{
+                            case "Brand": {
                                 return <td key={column}>{product.brand}</td>
                             }
-                            case "Rank":{
+                            case "Rank": {
                                 return <td key={column}>{product.rank}</td>
                             }
-                            case "Display":{
+                            case "Display": {
                                 return <td key={column}>{product.screen}</td>
                             }
-                            case "Ram":{
+                            case "Ram": {
                                 return <td key={column}>{product.ram}</td>
                             }
-                            case "CPU":{
+                            case "CPU": {
                                 return <td key={column}>{product.cpu}</td>
                             }
-                            case "SSD":{
+                            case "SSD": {
                                 return <td key={column}>{product.ssd}</td>
                             }
-                            case "HHD":{
+                            case "HHD": {
                                 return <td key={column}>{product.hhd}</td>
                             }
-                            case "Model":{
+                            case "Model": {
                                 return <td key={column}>{product.model}</td>
                             }
-                            case "Keyboard":{
+                            case "Keyboard": {
                                 return <td key={column}>{product.backlit}</td>
                             }
-                            case "DVD":{
+                            case "DVD": {
                                 return <td key={column}>{product.dvd}</td>
                             }
-                            case "Note":{
+                            case "Note": {
                                 return <td key={column}>{product.note}</td>
                             }
-                            case "Office":{
+                            case "Office": {
                                 return <td key={column}>{product.office}</td>
                             }
-                            case "OS":{
+                            case "OS": {
                                 return <td key={column}>{product.os}</td>
                             }
-                            case "Security":{
+                            case "Security": {
                                 return <td key={column}>{product.security}</td>
                             }
-                            case "UPC":{
+                            case "UPC": {
                                 return <td key={column}>{product.upc}</td>
                             }
-                            case "SKU":{
+                            case "SKU": {
                                 return <td key={column}>{product.sku}</td>
                             }
-                            case "Type":{
+                            case "Type": {
                                 return <td key={column}>{product.type}</td>
                             }
-                            case "Video Card":{
+                            case "Video Card": {
                                 return <td key={column}>{product.vc}</td>
                             }
-                            case "Version":{
+                            case "Version": {
                                 return <td key={column}>{product.version}</td>
                             }
                         }
@@ -142,61 +128,42 @@ class ProductsTable extends Component<InjectProps, ProductTableState> {
         })
     }
 
-    render(){
+    handleCheckBoxToggle(column: string) {
+        const displayColumns = this.state.displayColumns;
+        const columnIndex = this.state.displayColumns.indexOf(column);
+        console.log(displayColumns, column);
+        if (columnIndex === -1){
+            displayColumns.push(column);
+        }
+        else{
+            displayColumns.splice(columnIndex, 1);
+        }
+        this.setState({
+            displayColumns: displayColumns
+        })
+    }
+
+    render() {
         return (
-          <Paper component="form" className="root">
             <div>
-                <Button variant="primary" onClick={() => this.onOpenModal()}>
-                    Columns Options
-                </Button>
-                <Modal show={this.state.showColumnOptions} onHide={() => this.onCloseModal()}>
-                    <Modal.Header closeButton>
-                        <Modal.Title>Select which columns you want to display</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <Form>
-                            {this.state.columns.map((column: string) => {
-                                let checked: boolean = false;
-                                if (this.state.displayColumns.indexOf(column) != -1){
-                                    checked = true;
-                                }
-                                return (
-                                    <Form.Check
-                                        type='checkbox' 
-                                        key={column}
-                                        label={column}
-                                        defaultChecked={checked}
-                                    />
-                                )
-                            })}
-                        </Form>
-                    </Modal.Body>
-                    <Modal.Footer>
-                    <Button variant="secondary" onClick={() => this.onCloseModal()}>
-                        Close
-                    </Button>
-                    <Button variant="primary" onClick={() => this.onCloseModal()}>
-                        Save Changes
-                    </Button>
-                    </Modal.Footer>
-                </Modal>
-                <ColumnOptions
+                <ColumnOption 
                     displayColumns={this.state.displayColumns}
+                    handleCheckBoxToggle={this.handleCheckBoxToggle.bind(this)}
                 />
+                <div>
+                    <table className="table table-hover table-striped tableFixHead">
+                        <thead className="thead-dark">
+                            {this.renderTableHeader()}
+                        </thead>
+                        <tbody className="table-bordered scrollit">
+                            {this.renderTableData()}
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <div>
-              <table className="table table-hover table-striped tableFixHead">
-                <thead className="thead-dark">
-                  {this.renderTableHeader()}
-                </thead>
-                <tbody className="table-bordered scrollit">
-                  {this.renderTableData()}
-                </tbody>
-              </table>
-            </div>
-          </Paper>
+
         )
-      }
+    }
 }
 
 export default ProductsTable;
