@@ -1,16 +1,32 @@
 import React, { Component } from 'react';
-import { Product, ProductTableState } from '../../common/types';
+import { Product } from '../../common/types';
 import DehazeIcon from '@material-ui/icons/Dehaze';
 import Paper from '@material-ui/core/Paper';
 import ColumnOptions from './column-options-component';
-import { Button, Modal } from 'react-bootstrap';
+import { Button, Modal, Form } from 'react-bootstrap';
 
+interface ProductTableState {
+    displayProducts: Product[];
+    displayColumns: string[];
+    columns: string[];
+    activePage: number;
+    totalPages: number | null;
+    totalItemsCount: number | null;
+    itemsCountPerPage: number | null;
+    showColumnOptions: boolean;
+}
 
-class ProductsTable extends Component<{ products: Product[] }, ProductTableState> {
+interface InjectProps {
+    products: Product[];
+}
+
+class ProductsTable extends Component<InjectProps, ProductTableState> {
 
     state: ProductTableState = {
         displayProducts: [],
         displayColumns: ["Asin", "Price", "Rank", "Brand", "Model"],
+        columns: ["Asin", "Price", "Brand", "Rank", "Display", "Ram", "CPU", "SSD", "HHD", "Model", "Keyboard", "DVD", 
+        "Note", "Office", "OS", "Security", "UPC", "SKU", "Type", "Version", "Video Card"],
         activePage: 1,
         totalPages: null,
         totalItemsCount: null,
@@ -34,6 +50,10 @@ class ProductsTable extends Component<{ products: Product[] }, ProductTableState
         this.setState({
             showColumnOptions: !this.state.showColumnOptions
         })
+    }
+
+    onToggleCheckbox(){
+        
     }
 
     renderTableHeader(){
@@ -126,25 +146,42 @@ class ProductsTable extends Component<{ products: Product[] }, ProductTableState
         return (
           <Paper component="form" className="root">
             <div>
-                <Button variant="primary" onClick = {() => this.onOpenModal()}>
+                <Button variant="primary" onClick={() => this.onOpenModal()}>
                     Columns Options
                 </Button>
-                <Modal show = {this.state.showColumnOptions} onHide = {() => this.onCloseModal()}>
+                <Modal show={this.state.showColumnOptions} onHide={() => this.onCloseModal()}>
                     <Modal.Header closeButton>
-                        <Modal.Title>Modal heading</Modal.Title>
+                        <Modal.Title>Select which columns you want to display</Modal.Title>
                     </Modal.Header>
-                    <Modal.Body>Woohoo, you're reading this text in a modal!</Modal.Body>
+                    <Modal.Body>
+                        <Form>
+                            {this.state.columns.map((column: string) => {
+                                let checked: boolean = false;
+                                if (this.state.displayColumns.indexOf(column) != -1){
+                                    checked = true;
+                                }
+                                return (
+                                    <Form.Check
+                                        type='checkbox' 
+                                        key={column}
+                                        label={column}
+                                        defaultChecked={checked}
+                                    />
+                                )
+                            })}
+                        </Form>
+                    </Modal.Body>
                     <Modal.Footer>
-                    <Button variant="secondary" onClick = {() => this.onCloseModal()}>
+                    <Button variant="secondary" onClick={() => this.onCloseModal()}>
                         Close
                     </Button>
-                    <Button variant="primary" onClick = {() => this.onCloseModal()}>
+                    <Button variant="primary" onClick={() => this.onCloseModal()}>
                         Save Changes
                     </Button>
                     </Modal.Footer>
                 </Modal>
                 <ColumnOptions
-                    displayColumns = {this.state.displayColumns}
+                    displayColumns={this.state.displayColumns}
                 />
             </div>
             <div>

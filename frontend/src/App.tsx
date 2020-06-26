@@ -1,8 +1,12 @@
 import './App.css';
 import React, { Component } from 'react';
 import axios from 'axios';
-import { AppState } from './common/types';
 import ProductsTable from './components/products-table/products-table.component';
+import { Product } from './common/types';
+
+interface AppState {
+  products: Product[];
+}
 
 class App extends Component {
   state : AppState = {
@@ -25,7 +29,7 @@ class App extends Component {
     return (
       <div>
         <ProductsTable
-          products = {this.state.products}
+          products={this.state.products}
         />
       </div>
     )

@@ -23,21 +23,3 @@ export interface Product {
     "note": string;
     "version": number;
 }
-
-export interface AppState {
-    products: Product[];
-}
-
-export interface ProductTableState {
-    displayProducts: Product[];
-    displayColumns: string[];
-    activePage: number;
-    totalPages: number | null;
-    totalItemsCount: number | null;
-    itemsCountPerPage: number | null;
-    showColumnOptions: boolean;
-}
-
-export interface ColumnOptionState {
-    columns: string[];
-}
