@@ -24,10 +24,20 @@ export interface Product {
     "version": number;
 }
 
-
-export interface TableState {
-    displayProducts: Product[];
+export interface AppState {
     products: Product[];
+}
+
+export interface ProductTableState {
+    displayProducts: Product[];
     displayColumns: string[];
+    activePage: number;
+    totalPages: number | null;
+    totalItemsCount: number | null;
+    itemsCountPerPage: number | null;
+    showColumnOptions: boolean;
+}
+
+export interface ColumnOptionState {
     columns: string[];
 }
