@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TablePagination
 
 interface ProductTableState {
     products: Product[]
-    displayColumns: string[];
+    columns: Column[];
     activePage: number;
     totalPages: number;
     totalItemsCount: number;
@@ -18,117 +18,153 @@ interface Column {
     id: string;
     label: string;
     hidden: boolean;
-    minWidth?: number;
-    align?: 'right';
-    format?: (value: number) => string;
+    minWidth: number;
+    align?: "left" | "center" | "right" | "justify";
+    format?: (value: any) => string;
 }
 
-const columns: Column[] = [
-    {
-        id: 'id',
-        label: 'ID',
-        hidden: false,
-        minWidth: 170
-    },
-    {
-        id: 'price',
-        label: 'Price',
-        hidden: false,
-        minWidth: 100,
-        format: (value: number) => value.toFixed(2),
-    },
-    {
-        id: 'asin',
-        label: 'ASIN',
-        hidden: false,
-        minWidth: 170
-    },
-    {
-        id: 'rank',
-        label: 'Rank',
-        hidden: false,
-        minWidth: 170
-    },
-    {
-        id: 'brand',
-        label: 'Brand',
-        hidden: false,
-        minWidth: 170
-    },
-    {
-        id: 'model',
-        label: 'Model',
-        hidden: false,
-        minWidth: 170
-    }
-];
-
-// function insertRow(
-//     id: string,
-//     price: number,
-//     asin: string,
-//     rank: number,
-//     link: string,
-//     brand: string,
-//     model: string,
-//     cpu: string,
-//     screen: string,
-//     ram: string,
-//     vc: string,
-//     ssd: string,
-//     hhd: string,
-//     type: string,
-//     os: string,
-//     dvd: boolean,
-//     backlit: boolean,
-//     security: boolean,
-//     office: boolean,
-//     upc: string,
-//     sku: string,
-//     note: string,
-//     version: number
-// ): Product {
-//     return {
-//         id,
-//         price,
-//         asin,
-//         rank,
-//         link,
-//         brand,
-//         model,
-//         cpu,
-//         screen,
-//         ram,
-//         vc,
-//         ssd,
-//         hhd,
-//         type,
-//         os,
-//         dvd,
-//         backlit,
-//         security,
-//         office,
-//         upc,
-//         sku,
-//         note,
-//         version
-//     }
-// }
-
-class ProductsTable extends Component {
+class ProductTable extends Component {
     state: ProductTableState = {
         products: [],
-        displayColumns: ["ASIN", "Price", "Rank", "Brand", "Model"],
+        columns: [
+            {
+                id: 'id',
+                label: 'ID',
+                hidden: false,
+                minWidth: 50
+            },
+            {
+                id: 'price',
+                label: 'Price',
+                hidden: false,
+                minWidth: 50,
+                format: (value: number) => value.toFixed(2),
+            },
+            {
+                id: 'asin',
+                label: 'ASIN',
+                hidden: false,
+                minWidth: 100
+            },
+            {
+                id: 'rank',
+                label: 'Rank',
+                hidden: false,
+                minWidth: 50
+            },
+            {
+                id: 'brand',
+                label: 'Brand',
+                hidden: false,
+                minWidth: 100
+            },
+            {
+                id: 'model',
+                label: 'Model',
+                hidden: false,
+                minWidth: 100
+            },
+            {
+                id: 'cpu',
+                label: 'CPU',
+                hidden: false,
+                minWidth: 100
+            },
+            {
+                id: 'screen',
+                label: 'Screen',
+                hidden: false,
+                minWidth: 100
+            },
+            {
+                id: 'vc',
+                label: 'Video Card',
+                hidden: false,
+                minWidth: 100
+            },
+            {
+                id: 'ram',
+                label: 'RAM',
+                hidden: false,
+                minWidth: 100
+            },
+            {
+                id: 'hhd',
+                label: 'HHD',
+                hidden: false,
+                minWidth: 100
+            },
+            {
+                id: 'ssd',
+                label: 'SSD',
+                hidden: false,
+                minWidth: 100
+            },
+            {
+                id: 'type',
+                label: 'Type',
+                hidden: true,
+                minWidth: 100
+            },
+            {
+                id: 'dvd',
+                label: 'DVD',
+                hidden: true,
+                minWidth: 30
+            },
+            {
+                id: 'backlit',
+                label: 'Backlit',
+                hidden: true,
+                minWidth: 30
+            },
+            {
+                id: 'security',
+                label: 'Security',
+                hidden: true,
+                minWidth: 30
+            },
+            {
+                id: 'office',
+                label: 'Office',
+                hidden: true,
+                minWidth: 30
+            },
+            {
+                id: 'upc',
+                label: 'UPC',
+                hidden: true,
+                minWidth: 200
+            },
+            {
+                id: 'sku',
+                label: 'SKU',
+                hidden: true,
+                minWidth: 200
+            },
+            {
+                id: 'note',
+                label: 'Note',
+                hidden: true,
+                minWidth: 200
+            },
+            {
+                id: 'version',
+                label: 'Version',
+                hidden: true,
+                minWidth: 50
+            }
+        ],
         activePage: 0,
         totalPages: 0,
         totalItemsCount: 0,
-        itemsCountPerPage: 20,
+        itemsCountPerPage: 50,
         showColumnOptions: false
     }
 
     fetchProducts(page: number, size: number) {
         axios.get(`http://localhost:8080/products?page=${page}&size=${size}`)
-            .then(response => this.setState({
+            .then(response =>  this.setState({
                 products: response.data.content,
                 totalPages: response.data.totalPages,
                 totalItemsCount: response.data.totalElements,
@@ -242,18 +278,18 @@ class ProductsTable extends Component {
     }
 
     handleCheckBoxToggle(column: string): void {
-        const displayColumns = this.state.displayColumns;
-        const columnIndex = this.state.displayColumns.indexOf(column);
-        console.log(displayColumns, column);
-        if (columnIndex === -1) {
-            displayColumns.push(column);
-        }
-        else {
-            displayColumns.splice(columnIndex, 1);
-        }
-        this.setState({
-            displayColumns: displayColumns
-        })
+        // const displayColumns = this.state.displayColumns;
+        // const columnIndex = this.state.displayColumns.indexOf(column);
+        // console.log(displayColumns, column);
+        // if (columnIndex === -1) {
+        //     displayColumns.push(column);
+        // }
+        // else {
+        //     displayColumns.splice(columnIndex, 1);
+        // }
+        // this.setState({
+        //     displayColumns: displayColumns
+        // })
     }
 
     render() {
@@ -267,7 +303,7 @@ class ProductsTable extends Component {
                     <Table stickyHeader aria-label="sticky table">
                         <TableHead>
                             <TableRow>
-                                {columns
+                                {this.state.columns
                                     .filter((column: Column) => !column.hidden)
                                     .map((column: Column) => {
                                         return (
@@ -287,16 +323,18 @@ class ProductsTable extends Component {
                                 .map((product: Product) => {
                                     return (
                                         <TableRow hover role="checkbox" tabIndex={-1} key={product.asin}>
-                                            {columns.map((column: Column) => {
-                                                const value = this.getValueFromProduct(product, column.label);
-                                                return (
-                                                    <TableCell key={column.id} align={column.align}>
-                                                        {column.format && typeof value === "number"
-                                                            ? column.format(value)
-                                                            : value}
-                                                    </TableCell>
-                                                );
-                                            })}
+                                            {this.state.columns
+                                                .filter((column: Column) => !column.hidden)
+                                                .map((column: Column) => {
+                                                    const value = this.getValueFromProduct(product, column.label);
+                                                    return (
+                                                        <TableCell key={column.id} align={column.align}>
+                                                            {column.format && value
+                                                                ? column.format(value)
+                                                                : value}
+                                                        </TableCell>
+                                                    );
+                                                })}
                                         </TableRow>
                                     );
                                 })}
@@ -309,4 +347,4 @@ class ProductsTable extends Component {
     }
 }
 
-export default ProductsTable;
+export default ProductTable;
