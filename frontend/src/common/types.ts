@@ -23,3 +23,13 @@ export interface Product {
     note: string;
     version: number;
 }
+
+export interface Column {
+    id: string;
+    label: string;
+    hidden: boolean;
+    minWidth: number;
+    order: 'asc' | 'desc' | false;
+    align?: "left" | "center" | "right" | "justify";
+    format?: (value: any) => string;
+}

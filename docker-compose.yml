@@ -5,14 +5,14 @@ networks:
     external:
       name: local_test
 services:
-  frontend:
-    image: congmeng1015/amazonscrapper-frontend:latest
-    container_name: scrapper_app
-    ports:
-      - "3000:3000"
-    depends_on:
-      - controller
-    stdin_open: true
+  # frontend:
+  #   image: congmeng1015/amazonscrapper-frontend:latest
+  #   container_name: scrapper_app
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     - controller
+  #   stdin_open: true
   controller:
       image: congmeng1015/amazonscrapper:latest
       container_name: scrapper_springboot

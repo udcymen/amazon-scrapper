@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { Product } from '../../common/types';
+import { Product, Column } from '../../common/types';
 import axios from 'axios';
 import ColumnOption from './column-option.component';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow } from '@material-ui/core'
+import { Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Modal, Button } from '@material-ui/core';
+
 
 interface ProductTableState {
     products: Product[]
@@ -14,17 +15,6 @@ interface ProductTableState {
     showColumnOptions: boolean;
 }
 
-interface Column {
-    id: string;
-    label: string;
-    hidden: boolean;
-    minWidth: number;
-    order? : "asc" | "desc";
-    align?: "left" | "center" | "right" | "justify";
-    format?: (value: any) => string;
-}
-
-
 class ProductTable extends Component {
     state: ProductTableState = {
         products: [],
@@ -33,136 +23,155 @@ class ProductTable extends Component {
                 id: 'id',
                 label: 'ID',
                 hidden: false,
-                minWidth: 50
+                minWidth: 50,
+                order: 'desc'
             },
             {
                 id: 'price',
                 label: 'Price',
                 hidden: false,
                 minWidth: 50,
-                format: (value: number) => value.toFixed(2)
+                order: false,
+                format: (value: number) => value.toFixed(2),
             },
             {
                 id: 'asin',
                 label: 'ASIN',
                 hidden: false,
-                minWidth: 100
+                minWidth: 100,
+                order: false,
             },
             {
                 id: 'rank',
                 label: 'Rank',
                 hidden: false,
-                minWidth: 50
+                minWidth: 50,
+                order: false,
             },
             {
                 id: 'brand',
                 label: 'Brand',
                 hidden: false,
                 minWidth: 100,
-                order: 'desc'
+                order: false,
             },
             {
                 id: 'model',
                 label: 'Model',
                 hidden: false,
                 minWidth: 100,
-                order: 'desc'
+                order: false,
             },
             {
                 id: 'cpu',
                 label: 'CPU',
                 hidden: false,
-                minWidth: 100
-            },
-            {
-                id: 'screen',
-                label: 'Screen',
-                hidden: false,
-                minWidth: 100
+                minWidth: 100,
+                order: false,
             },
             {
                 id: 'vc',
                 label: 'Video Card',
                 hidden: false,
-                minWidth: 100
+                minWidth: 100,
+                order: false,
             },
             {
                 id: 'ram',
                 label: 'RAM',
                 hidden: false,
-                minWidth: 100
+                minWidth: 100,
+                order: false,
             },
             {
                 id: 'hhd',
                 label: 'HHD',
                 hidden: false,
-                minWidth: 100
+                minWidth: 100,
+                order: false,
             },
             {
                 id: 'ssd',
                 label: 'SSD',
                 hidden: false,
-                minWidth: 100
+                minWidth: 100,
+                order: false,
             },
             {
                 id: 'type',
                 label: 'Type',
                 hidden: true,
-                minWidth: 100
+                minWidth: 100,
+                order: false,
+            },
+            {
+                id: 'screen',
+                label: 'Screen',
+                hidden: true,
+                minWidth: 100,
+                order: false,
             },
             {
                 id: 'dvd',
                 label: 'DVD',
                 hidden: true,
-                minWidth: 30
+                minWidth: 30,
+                order: false,
             },
             {
                 id: 'backlit',
                 label: 'Backlit',
                 hidden: true,
-                minWidth: 30
+                minWidth: 30,
+                order: false,
             },
             {
                 id: 'security',
                 label: 'Security',
                 hidden: true,
-                minWidth: 30
+                minWidth: 30,
+                order: false,
             },
             {
                 id: 'office',
                 label: 'Office',
                 hidden: true,
-                minWidth: 30
+                minWidth: 30,
+                order: false,
             },
             {
                 id: 'upc',
                 label: 'UPC',
                 hidden: true,
-                minWidth: 200
+                minWidth: 200,
+                order: false,
             },
             {
                 id: 'sku',
                 label: 'SKU',
                 hidden: true,
-                minWidth: 200
+                minWidth: 200,
+                order: false,
             },
             {
                 id: 'note',
                 label: 'Note',
                 hidden: true,
-                minWidth: 200
+                minWidth: 200,
+                order: false,
             },
             {
                 id: 'version',
                 label: 'Version',
                 hidden: true,
-                minWidth: 50
+                minWidth: 50,
+                order: false,
             }
         ],
         activePage: 0,
         totalPages: 0,
         totalItemsCount: 0,
-        itemsCountPerPage: 50,
+        itemsCountPerPage: 10,
         showColumnOptions: false
     }
 
@@ -170,7 +179,7 @@ class ProductTable extends Component {
         let sortString: string = "";
 
         this.state.columns.map((column: Column) => {
-            if (column.order){
+            if (column.order !== false){
                 sortString += `&sort=${column.id},${column.order}`
             }
         });
@@ -293,29 +302,58 @@ class ProductTable extends Component {
         return result;
     }
 
-    handleCheckBoxToggle(column: string): void {
-        // const displayColumns = this.state.displayColumns;
-        // const columnIndex = this.state.displayColumns.indexOf(column);
-        // console.log(displayColumns, column);
-        // if (columnIndex === -1) {
-        //     displayColumns.push(column);
-        // }
-        // else {
-        //     displayColumns.splice(columnIndex, 1);
-        // }
-        // this.setState({
-        //     displayColumns: displayColumns
-        // })
+    handleCheckBoxToggle(column: Column): void {
+        const columns = this.state.columns;
+        const columnIndex = columns.indexOf(column);
+        column.hidden = !column.hidden;
+        columns[columnIndex] = column;
+        this.setState({
+            columns: columns
+        })
+    }
+
+    handleChangePage(event: unknown, newPage: number){
+        this.fetchProducts(newPage, this.state.itemsCountPerPage);
+    }
+
+    handleChangeRowsPerPage(event: React.ChangeEvent<HTMLInputElement>){
+        this.fetchProducts(this.state.activePage, +event.target.value);
+    }
+
+    handleOpenColumnOption(){
+        this.setState({
+            showColumnOptions: true
+        })
+    }
+
+    handleCloseColumnOption(){
+        this.setState({
+            showColumnOptions: false
+        })
     }
 
     render() {
         return (
-            <div>
-                {/* <ColumnOption 
-                    displayColumns={this.state.displayColumns}
-                    handleCheckBoxToggle={this.handleCheckBoxToggle.bind(this)}
-                /> */}
-                <TableContainer className="container">
+            <div className="container">
+                <Button variant="contained" color="primary" onClick={this.handleOpenColumnOption.bind(this)}>
+                    Columns
+                </Button>
+                <Modal 
+                    open={this.state.showColumnOptions} 
+                    onClose={this.handleCloseColumnOption.bind(this)}
+                    style={{
+                        display:'flex',
+                        alignItems:'center',
+                        justifyContent:'center',
+                        margin: 'auto'
+                    }}
+                >
+                    <ColumnOption 
+                        columns={this.state.columns}
+                        handleCheckBoxToggle={this.handleCheckBoxToggle.bind(this)}
+                    />
+                </Modal>
+                <TableContainer>
                     <Table stickyHeader aria-label="sticky table">
                         <TableHead>
                             <TableRow>
@@ -326,7 +364,7 @@ class ProductTable extends Component {
                                             <TableCell
                                                 key={column.id}
                                                 align={column.align}
-                                                style={{ minWidth: column.minWidth }}
+                                                style={{ minWidth: column.minWidth}}
                                             >
                                                 {column.label}
                                             </TableCell>
@@ -344,7 +382,7 @@ class ProductTable extends Component {
                                                 .map((column: Column) => {
                                                     const value = this.getValueFromProduct(product, column.label);
                                                     return (
-                                                        <TableCell key={column.id} align={column.align}>
+                                                        <TableCell key={product.asin+column.id} align={column.align}>
                                                             {column.format && value
                                                                 ? column.format(value)
                                                                 : value}
@@ -357,8 +395,16 @@ class ProductTable extends Component {
                         </TableBody>
                     </Table>
                 </TableContainer>
+                <TablePagination
+                    rowsPerPageOptions={[10, 25, 50, 100]}
+                    component="div"
+                    count={this.state.totalItemsCount}
+                    rowsPerPage={this.state.itemsCountPerPage}
+                    page={this.state.activePage}
+                    onChangePage={this.handleChangePage.bind(this)}
+                    onChangeRowsPerPage={this.handleChangeRowsPerPage.bind(this)}
+                />
             </div>
-
         )
     }
 }
