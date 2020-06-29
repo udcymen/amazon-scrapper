@@ -19,9 +19,11 @@ interface Column {
     label: string;
     hidden: boolean;
     minWidth: number;
+    order? : "asc" | "desc";
     align?: "left" | "center" | "right" | "justify";
     format?: (value: any) => string;
 }
+
 
 class ProductTable extends Component {
     state: ProductTableState = {
@@ -38,7 +40,7 @@ class ProductTable extends Component {
                 label: 'Price',
                 hidden: false,
                 minWidth: 50,
-                format: (value: number) => value.toFixed(2),
+                format: (value: number) => value.toFixed(2)
             },
             {
                 id: 'asin',
@@ -56,13 +58,15 @@ class ProductTable extends Component {
                 id: 'brand',
                 label: 'Brand',
                 hidden: false,
-                minWidth: 100
+                minWidth: 100,
+                order: 'desc'
             },
             {
                 id: 'model',
                 label: 'Model',
                 hidden: false,
-                minWidth: 100
+                minWidth: 100,
+                order: 'desc'
             },
             {
                 id: 'cpu',
@@ -163,7 +167,19 @@ class ProductTable extends Component {
     }
 
     fetchProducts(page: number, size: number) {
-        axios.get(`http://localhost:8080/products?page=${page}&size=${size}`)
+        let sortString: string = "";
+
+        this.state.columns.map((column: Column) => {
+            if (column.order){
+                sortString += `&sort=${column.id},${column.order}`
+            }
+        });
+
+        let requestUrl: string = `http://localhost:8080/products?page=${page}&size=${size}${sortString}`;
+
+        console.log(requestUrl);
+
+        axios.get(requestUrl)
             .then(response =>  this.setState({
                 products: response.data.content,
                 totalPages: response.data.totalPages,

@@ -12,7 +12,8 @@ public class Product extends AuditModel {
     @SequenceGenerator(
             name = "product_generator",
             sequenceName = "product_sequence",
-            initialValue = 100
+            initialValue = 100,
+            allocationSize = 1
     )
     private long id;
 

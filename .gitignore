@@ -103,8 +103,10 @@ dist
 # TernJS port file
 .tern-port
 
-### Mac shit ###
-.DS_Store
-
 ### Node Modules ###
 */node_modules
+
+build
+
+### Mac shit ###
+*/.DS_Store
