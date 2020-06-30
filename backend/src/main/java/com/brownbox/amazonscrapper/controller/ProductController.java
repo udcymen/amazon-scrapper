@@ -27,18 +27,23 @@ public class ProductController {
 
    @GetMapping("/searchProducts")
    public Page<Product> searchProducts(Pageable pageable, String searchTerms){
+       searchTerms = searchTerms.toLowerCase().trim();
+
+       if (searchTerms == "") {
+           return this.getProducts(pageable);
+       }
+
        List<Product> result = new ArrayList<>();
        boolean isFirstEmpty = true;
-       searchTerms = searchTerms.toLowerCase();
 
        for (String searchTerm : searchTerms.split(" ")){
            Set<Product> local = new HashSet<>();
-           local.addAll(productRepository.findByBrandIgnoreCase(searchTerm));
-           local.addAll(productRepository.findByCpuIgnoreCase(searchTerm));
-           local.addAll(productRepository.findByScreenIgnoreCase(searchTerm));
-           local.addAll(productRepository.findByRamIgnoreCase(searchTerm));
-           local.addAll(productRepository.findByModelIgnoreCase(searchTerm));
-           local.addAll(productRepository.findByCategoryIgnoreCase(searchTerm));
+           local.addAll(productRepository.findByBrandContainingIgnoreCase(searchTerm));
+           local.addAll(productRepository.findByCpuContainingIgnoreCase(searchTerm));
+           local.addAll(productRepository.findByScreenContainingIgnoreCase(searchTerm));
+           local.addAll(productRepository.findByRamContainingIgnoreCase(searchTerm));
+           local.addAll(productRepository.findByModelContainingIgnoreCase(searchTerm));
+           local.addAll(productRepository.findByCategoryContainingIgnoreCase(searchTerm));
 
            if (result.size() == 0) {
                if (isFirstEmpty) {
@@ -48,8 +53,11 @@ public class ProductController {
                    break;
                }
            }
-
            result.retainAll(local);
+       }
+
+       if (result.size() == 0) {
+           throw  new ResourceNotFoundException("No Matching Keyword(" + searchTerms + ") Products Found!");
        }
 
        final Page<Product> page = new PageImpl<>(result, pageable, result.size());

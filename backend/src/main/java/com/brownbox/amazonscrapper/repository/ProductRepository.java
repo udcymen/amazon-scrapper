@@ -11,10 +11,10 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
-   Collection<Product> findByBrandIgnoreCase(String brand);
-   Collection<Product> findByCpuIgnoreCase(String cpu);
-   Collection<Product> findByScreenIgnoreCase(String screen);
-   Collection<Product> findByRamIgnoreCase(String ram);
-   Collection<Product> findByModelIgnoreCase(String model);
-   Collection<Product> findByCategoryIgnoreCase(String category);
+   Collection<Product> findByBrandContainingIgnoreCase(String brand);
+   Collection<Product> findByCpuContainingIgnoreCase(String cpu);
+   Collection<Product> findByScreenContainingIgnoreCase(String screen);
+   Collection<Product> findByRamContainingIgnoreCase(String ram);
+   Collection<Product> findByModelContainingIgnoreCase(String model);
+   Collection<Product> findByCategoryContainingIgnoreCase(String category);
 }
