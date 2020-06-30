@@ -1,36 +1,37 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect, useRef, createRef } from 'react';
 import { Product, Column } from '../../common/types';
 import axios from 'axios';
-import ColumnOption from './column-option.component';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Modal, Button } from '@material-ui/core';
+import { ColumnDialog } from './column-dialog.component';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Modal, Button, makeStyles, createStyles, Theme } from '@material-ui/core';
+import { KeyboardArrowDown, KeyboardArrowUp } from '@material-ui/icons';
 
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    modal: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        margin: 'auto'
+    },
+  }),
+);
 
-interface ProductTableState {
-    products: Product[]
-    columns: Column[];
-    activePage: number;
-    totalPages: number;
-    totalItemsCount: number;
-    itemsCountPerPage: number;
-    showColumnOptions: boolean;
-}
-
-class ProductTable extends Component {
-    state: ProductTableState = {
-        products: [],
-        columns: [
+export const ProductTable: React.FC = () => {
+    const [products, setProducts] = useState<Product[]>([]);
+    const [columns, setColumns] = useState<Column[]>(
+        [
             {
                 id: 'id',
                 label: 'ID',
                 hidden: false,
-                minWidth: 50,
+                minWidth: 150,
                 order: 'desc'
             },
             {
                 id: 'price',
                 label: 'Price',
                 hidden: false,
-                minWidth: 50,
+                minWidth: 100,
                 order: false,
                 format: (value: number) => value.toFixed(2),
             },
@@ -38,77 +39,77 @@ class ProductTable extends Component {
                 id: 'asin',
                 label: 'ASIN',
                 hidden: false,
-                minWidth: 100,
+                minWidth: 150,
                 order: false,
             },
             {
                 id: 'rank',
                 label: 'Rank',
                 hidden: false,
-                minWidth: 50,
+                minWidth: 100,
                 order: false,
             },
             {
                 id: 'brand',
                 label: 'Brand',
                 hidden: false,
-                minWidth: 100,
+                minWidth: 150,
                 order: false,
             },
             {
                 id: 'model',
                 label: 'Model',
                 hidden: false,
-                minWidth: 100,
+                minWidth: 150,
                 order: false,
             },
             {
                 id: 'cpu',
                 label: 'CPU',
                 hidden: false,
-                minWidth: 100,
+                minWidth: 150,
                 order: false,
             },
             {
                 id: 'vc',
                 label: 'Video Card',
                 hidden: false,
-                minWidth: 100,
+                minWidth: 150,
                 order: false,
             },
             {
                 id: 'ram',
                 label: 'RAM',
                 hidden: false,
-                minWidth: 100,
+                minWidth: 150,
                 order: false,
             },
             {
                 id: 'hhd',
                 label: 'HHD',
                 hidden: false,
-                minWidth: 100,
+                minWidth: 150,
                 order: false,
             },
             {
                 id: 'ssd',
                 label: 'SSD',
                 hidden: false,
-                minWidth: 100,
+                minWidth: 150,
                 order: false,
             },
             {
                 id: 'type',
                 label: 'Type',
                 hidden: true,
-                minWidth: 100,
+                minWidth: 150,
                 order: false,
             },
             {
                 id: 'screen',
                 label: 'Screen',
                 hidden: true,
-                minWidth: 100,
+                minWidth: 150,
                 order: false,
             },
             {
@@ -164,46 +165,50 @@ class ProductTable extends Component {
                 id: 'version',
                 label: 'Version',
                 hidden: true,
-                minWidth: 50,
+                minWidth: 100,
                 order: false,
             }
-        ],
-        activePage: 0,
-        totalPages: 0,
-        totalItemsCount: 0,
-        itemsCountPerPage: 10,
-        showColumnOptions: false
-    }
+        ]
+    )
+    const [activePage, setActivePage] = useState<number>(0);
+    const [totalItemsCount, setTotalItemsCount] = useState<number>(0);
+    const [itemsCountPerPage, setItemsCountPerPage] = useState<number>(10);
+    const [showColumnOptions, setShowColumnOptions] = useState<boolean>(false);
 
-    fetchProducts(page: number, size: number) {
-        let sortString: string = "";
+    const ItemsCountPerPage = [10, 25, 50, 100];
 
-        this.state.columns.map((column: Column) => {
-            if (column.order !== false){
-                sortString += `&sort=${column.id},${column.order}`
-            }
-        });
+    const classes = useStyles();
 
-        let requestUrl: string = `http://localhost:8080/products?page=${page}&size=${size}${sortString}`;
+    useEffect(() => {
+        function fetchProducts() {
+        
+            let sortString: string = "";
+    
+            columns.forEach((column: Column) => {
+                if (column.order !== false) {
+                    sortString += `&sort=${column.id},${column.order}`
+                }
+            });
+    
+            let requestUrl: string = `http://localhost:8080/products?page=${activePage}&size=${itemsCountPerPage}${sortString}`;
+    
+            console.log(requestUrl);
+    
+            axios.get(requestUrl)
+                .then(response => {
+                    setProducts(response.data.content);
+                    setTotalItemsCount(response.data.totalElements);
+                })
+                .catch(err => console.log(err))
+        };
 
-        console.log(requestUrl);
+        fetchProducts();
 
-        axios.get(requestUrl)
-            .then(response =>  this.setState({
-                products: response.data.content,
-                totalPages: response.data.totalPages,
-                totalItemsCount: response.data.totalElements,
-                activePage: response.data.number + 1,
-                itemsCountPerPage: response.data.size
-            }))
-            .catch(err => console.log(err))
-    }
+    }, [activePage, itemsCountPerPage, columns]);
 
-    componentDidMount() {
-        this.fetchProducts(this.state.activePage, this.state.itemsCountPerPage);
-    }
 
-    getValueFromProduct(product: Product, prop: string): any {
+
+    function getValueFromProduct(product: Product, prop: string): any {
         let result = null;
         switch (prop) {
             case "ID": {
@@ -302,111 +307,108 @@ class ProductTable extends Component {
         return result;
     }
 
-    handleCheckBoxToggle(column: Column): void {
-        const columns = this.state.columns;
-        const columnIndex = columns.indexOf(column);
+    function handleCheckBoxToggle(column: Column): void {
         column.hidden = !column.hidden;
-        columns[columnIndex] = column;
-        this.setState({
-            columns: columns
-        })
+        console.log(column);
+        console.log(columns);
     }
 
-    handleChangePage(event: unknown, newPage: number){
-        this.fetchProducts(newPage, this.state.itemsCountPerPage);
+    function handleChangePage(event: React.MouseEvent<HTMLButtonElement, MouseEvent> | null, newPage: number) {
+        setActivePage(newPage);
     }
 
-    handleChangeRowsPerPage(event: React.ChangeEvent<HTMLInputElement>){
-        this.fetchProducts(this.state.activePage, +event.target.value);
+    function handleChangeRowsPerPage(event: React.ChangeEvent<HTMLInputElement>) {
+        setItemsCountPerPage(+event.target.value);
     }
 
-    handleOpenColumnOption(){
-        this.setState({
-            showColumnOptions: true
-        })
+    function handleOpenColumnOption() {
+        setShowColumnOptions(true);
     }
 
-    handleCloseColumnOption(){
-        this.setState({
-            showColumnOptions: false
-        })
+    function handleCloseColumnOption() {
+        setShowColumnOptions(false);
     }
 
-    render() {
-        return (
-            <div className="container">
-                <Button variant="contained" color="primary" onClick={this.handleOpenColumnOption.bind(this)}>
-                    Columns
+    return (
+        <div>
+            <Button variant="contained" color="primary" onClick={handleOpenColumnOption}>
+                Columns
                 </Button>
-                <Modal 
-                    open={this.state.showColumnOptions} 
-                    onClose={this.handleCloseColumnOption.bind(this)}
-                    style={{
-                        display:'flex',
-                        alignItems:'center',
-                        justifyContent:'center',
-                        margin: 'auto'
-                    }}
-                >
-                    <ColumnOption 
-                        columns={this.state.columns}
-                        handleCheckBoxToggle={this.handleCheckBoxToggle.bind(this)}
-                    />
-                </Modal>
-                <TableContainer>
-                    <Table stickyHeader aria-label="sticky table">
-                        <TableHead>
-                            <TableRow>
-                                {this.state.columns
-                                    .filter((column: Column) => !column.hidden)
-                                    .map((column: Column) => {
-                                        return (
-                                            <TableCell
-                                                key={column.id}
-                                                align={column.align}
-                                                style={{ minWidth: column.minWidth}}
-                                            >
-                                                {column.label}
-                                            </TableCell>
-                                        )
-                                    })}
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {this.state.products
-                                .map((product: Product) => {
-                                    return (
-                                        <TableRow hover role="checkbox" tabIndex={-1} key={product.asin}>
-                                            {this.state.columns
-                                                .filter((column: Column) => !column.hidden)
-                                                .map((column: Column) => {
-                                                    const value = this.getValueFromProduct(product, column.label);
-                                                    return (
-                                                        <TableCell key={product.asin+column.id} align={column.align}>
-                                                            {column.format && value
-                                                                ? column.format(value)
-                                                                : value}
-                                                        </TableCell>
-                                                    );
-                                                })}
-                                        </TableRow>
-                                    );
-                                })}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-                <TablePagination
-                    rowsPerPageOptions={[10, 25, 50, 100]}
-                    component="div"
-                    count={this.state.totalItemsCount}
-                    rowsPerPage={this.state.itemsCountPerPage}
-                    page={this.state.activePage}
-                    onChangePage={this.handleChangePage.bind(this)}
-                    onChangeRowsPerPage={this.handleChangeRowsPerPage.bind(this)}
+            <Modal
+                className={classes.modal}
+                open={showColumnOptions}
+                onClose={handleCloseColumnOption}
+            >
+                <ColumnDialog
+                    columns={columns}
+                    handleCheckBoxToggle={handleCheckBoxToggle}
                 />
-            </div>
-        )
-    }
+            </Modal>
+            <TableContainer>
+                <Table stickyHeader aria-label="sticky table">
+                    <TableHead>
+                        <TableRow>
+                            {columns
+                                .filter((column: Column) => !column.hidden)
+                                .map((column: Column) => {
+                                    return (
+                                        <TableCell
+                                            key={column.id}
+                                            align={column.align}
+                                            style={{ minWidth: column.minWidth }}
+                                        >
+                                            <>
+                                                {column.label}
+                                                {column.order 
+                                                    ?   (<a href="">
+                                                            {column.order === "asc" 
+                                                                ? <KeyboardArrowUp /> 
+                                                                : <KeyboardArrowDown />}
+                                                        </a>)
+                                                    : null
+                                                }
+                                            </>
+                                        </TableCell>
+                                    )
+                                })}
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {products
+                            .map((product: Product) => {
+                                return (
+                                    <TableRow hover role="checkbox" tabIndex={-1} key={product.asin}>
+                                        {columns
+                                            .filter((column: Column) => !column.hidden)
+                                            .map((column: Column) => {
+                                                const value = getValueFromProduct(product, column.label);
+                                                return (
+                                                    <TableCell key={product.asin + column.id} align={column.align}>
+                                                        {column.format && value
+                                                            ? column.format(value)
+                                                            : value}
+                                                    </TableCell>
+
+                                                );
+                                            })}
+                                    </TableRow>
+                                );
+                            })}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+            <TablePagination
+                rowsPerPageOptions={ItemsCountPerPage}
+                component="div"
+                count={totalItemsCount}
+                rowsPerPage={itemsCountPerPage}
+                page={activePage}
+                onChangePage={handleChangePage}
+                onChangeRowsPerPage={handleChangeRowsPerPage}
+            />
+        </div>
+    );
+
 }
 
 export default ProductTable;
