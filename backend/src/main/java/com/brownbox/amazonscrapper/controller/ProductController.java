@@ -20,17 +20,12 @@ public class ProductController {
     @Autowired
     private ProductRepository productRepository;
 
-    @GetMapping("/products")
-    public Page<Product> getProducts(Pageable pageable){
-        return productRepository.findAll(pageable);
-    }
-
-   @GetMapping("/searchProducts")
+   @GetMapping("/products")
    public Page<Product> searchProducts(Pageable pageable, String searchTerms){
        searchTerms = searchTerms.toLowerCase().trim();
 
-       if (searchTerms == "") {
-           return this.getProducts(pageable);
+       if (searchTerms == null || searchTerms == "") {
+            return productRepository.findAll(pageable);
        }
 
        List<Product> result = new ArrayList<>();

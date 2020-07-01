@@ -1,19 +1,44 @@
-import React, { useState, useEffect, useRef, createRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Product, Column } from '../../common/types';
 import axios from 'axios';
 import { ColumnDialog } from './column-dialog.component';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Modal, Button, makeStyles, createStyles, Theme } from '@material-ui/core';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Button, AppBar, Toolbar, Input } from '@material-ui/core';
+import { makeStyles, createStyles, Theme, fade } from '@material-ui/core/styles';
 import { KeyboardArrowDown, KeyboardArrowUp } from '@material-ui/icons';
+import SearchIcon from '@material-ui/icons/Search';
+
 
 const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    modal: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        margin: 'auto'
-    },
-  }),
+    createStyles({
+        search: {
+            flexGrow: 1,
+            position: 'relative',
+            borderRadius: theme.shape.borderRadius,
+            backgroundColor: fade(theme.palette.common.white, 0.15),
+            '&:hover': {
+                backgroundColor: fade(theme.palette.common.white, 0.25)
+            },
+            marginLeft: theme.spacing(5),
+        },
+        searchIcon: {
+            padding: theme.spacing(0, 2),
+            height: '100%',
+            position: 'absolute',
+            pointerEvents: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+        },
+        inputRoot: {
+            color: 'inherit'
+        },
+        inputInput: {
+            padding: theme.spacing(1, 1, 1, 0),
+            paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
+            transition: theme.transitions.create('width'),
+            width: '100%'
+        },
+    }),
 );
 
 export const ProductTable: React.FC = () => {
@@ -30,7 +55,7 @@ export const ProductTable: React.FC = () => {
             {
                 id: 'price',
                 label: 'Price',
-                hidden: false,
+                hidden: true,
                 minWidth: 100,
                 order: false,
                 format: (value: number) => value.toFixed(2),
@@ -169,44 +194,42 @@ export const ProductTable: React.FC = () => {
                 order: false,
             }
         ]
-    )
+    );
     const [activePage, setActivePage] = useState<number>(0);
     const [totalItemsCount, setTotalItemsCount] = useState<number>(0);
     const [itemsCountPerPage, setItemsCountPerPage] = useState<number>(10);
-    const [showColumnOptions, setShowColumnOptions] = useState<boolean>(false);
+    const [showColumnDialog, setshowColumnDialog] = useState<boolean>(false);
+    const [searchTerms, setSearchTerms] = useState<string>("");
 
     const ItemsCountPerPage = [10, 25, 50, 100];
 
     const classes = useStyles();
 
     useEffect(() => {
-        function fetchProducts() {
-        
-            let sortString: string = "";
-    
-            columns.forEach((column: Column) => {
-                if (column.order !== false) {
-                    sortString += `&sort=${column.id},${column.order}`
-                }
-            });
-    
-            let requestUrl: string = `http://localhost:8080/products?page=${activePage}&size=${itemsCountPerPage}${sortString}`;
-    
-            console.log(requestUrl);
-    
-            axios.get(requestUrl)
-                .then(response => {
-                    setProducts(response.data.content);
-                    setTotalItemsCount(response.data.totalElements);
-                })
-                .catch(err => console.log(err))
-        };
-
         fetchProducts();
+    }, [activePage, itemsCountPerPage, searchTerms, JSON.stringify(columns)]);
 
-    }, [activePage, itemsCountPerPage, columns]);
+    function fetchProducts() {
+        let sortString: string = "";
 
+        columns.forEach((column: Column) => {
+            if (!column.hidden && column.order !== false) {
+                sortString += `&sort=${column.id},${column.order}`
+            }
+        });
 
+        let requestUrl: string = `http://localhost:8080/products?page=${activePage}&size=${itemsCountPerPage}${sortString}&searchTerms=${searchTerms}`;
+
+        console.log("GET Products");
+        console.log(requestUrl);
+
+        axios.get(requestUrl)
+            .then(response => {
+                setProducts(response.data.content);
+                setTotalItemsCount(response.data.totalElements);
+            })
+            .catch(err => console.log(err))
+    };
 
     function getValueFromProduct(product: Product, prop: string): any {
         let result = null;
@@ -307,10 +330,12 @@ export const ProductTable: React.FC = () => {
         return result;
     }
 
-    function handleCheckBoxToggle(column: Column): void {
+    function handleToggleCheckbox(column: Column): void {
         column.hidden = !column.hidden;
-        console.log(column);
-        console.log(columns);
+        // const newColumns = columns;
+        // const columnsIndex = newColumns.indexOf(column);
+        // newColumns[columnsIndex].hidden = !newColumns[columnsIndex].hidden
+        // setColumns(newColumns);
     }
 
     function handleChangePage(event: React.MouseEvent<HTMLButtonElement, MouseEvent> | null, newPage: number) {
@@ -321,29 +346,55 @@ export const ProductTable: React.FC = () => {
         setItemsCountPerPage(+event.target.value);
     }
 
-    function handleOpenColumnOption() {
-        setShowColumnOptions(true);
+    function handleOpenColumnDialog() {
+        setshowColumnDialog(true);
     }
 
-    function handleCloseColumnOption() {
-        setShowColumnOptions(false);
+    function handleCloseColumnDialog() {
+        setshowColumnDialog(false);
+    }
+
+    function handleSearchChange(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+        setSearchTerms(event.target.value);
+    }
+
+    function handleSearchEnterPress(event: React.KeyboardEvent<HTMLDivElement>) {
+        if (event.key === "Enter"){
+            console.log(searchTerms);
+        }
     }
 
     return (
         <div>
-            <Button variant="contained" color="primary" onClick={handleOpenColumnOption}>
-                Columns
-                </Button>
-            <Modal
-                className={classes.modal}
-                open={showColumnOptions}
-                onClose={handleCloseColumnOption}
-            >
-                <ColumnDialog
-                    columns={columns}
-                    handleCheckBoxToggle={handleCheckBoxToggle}
-                />
-            </Modal>
+            <AppBar position="static" >
+                <Toolbar>
+                    <Button variant="contained" color="secondary" onClick={handleOpenColumnDialog}>
+                        Columns
+                    </Button>
+                    <div className={classes.search}>
+                        <div className={classes.searchIcon}>
+                            <SearchIcon />
+                        </div>
+                        <Input
+                            type="text"
+                            placeholder="Search Product Here…"
+                            classes={{
+                                root: classes.inputRoot,
+                                input: classes.inputInput,
+                            }}
+                            inputProps={{ 'aria-label': 'search products' }}
+                            onChange={handleSearchChange}
+                            onKeyPress={handleSearchEnterPress}
+                        />
+                    </div>
+                </Toolbar>
+            </AppBar>
+            <ColumnDialog
+                columns={columns}
+                showColumnDialog={showColumnDialog}
+                handleToggleCheckbox={handleToggleCheckbox}
+                handleCloseColumnDialog={handleCloseColumnDialog}
+            />
             <TableContainer>
                 <Table stickyHeader aria-label="sticky table">
                     <TableHead>
@@ -359,12 +410,12 @@ export const ProductTable: React.FC = () => {
                                         >
                                             <>
                                                 {column.label}
-                                                {column.order 
-                                                    ?   (<a href="">
-                                                            {column.order === "asc" 
-                                                                ? <KeyboardArrowUp /> 
-                                                                : <KeyboardArrowDown />}
-                                                        </a>)
+                                                {column.order
+                                                    ? (<a href="">
+                                                        {column.order === "asc"
+                                                            ? <KeyboardArrowUp />
+                                                            : <KeyboardArrowDown />}
+                                                    </a>)
                                                     : null
                                                 }
                                             </>
@@ -388,7 +439,6 @@ export const ProductTable: React.FC = () => {
                                                             ? column.format(value)
                                                             : value}
                                                     </TableCell>
-
                                                 );
                                             })}
                                     </TableRow>
