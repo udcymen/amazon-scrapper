@@ -2,10 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Product, Column } from '../../common/types';
 import axios from 'axios';
 import { ColumnDialog } from './column-dialog.component';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Button, AppBar, Toolbar, Input } from '@material-ui/core';
+import {Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Button, AppBar, Toolbar, Input } from '@material-ui/core';
 import { makeStyles, createStyles, Theme, fade } from '@material-ui/core/styles';
 import { KeyboardArrowDown, KeyboardArrowUp } from '@material-ui/icons';
 import SearchIcon from '@material-ui/icons/Search';
+import CheckIcon from '@material-ui/icons/Check';
 
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -143,6 +144,7 @@ export const ProductTable: React.FC = () => {
                 hidden: true,
                 minWidth: 30,
                 order: false,
+                format: (value: Boolean) => String(value),
             },
             {
                 id: 'backlit',
@@ -150,6 +152,7 @@ export const ProductTable: React.FC = () => {
                 hidden: true,
                 minWidth: 30,
                 order: false,
+                format: (value: Boolean) => String(value),
             },
             {
                 id: 'security',
@@ -157,6 +160,7 @@ export const ProductTable: React.FC = () => {
                 hidden: true,
                 minWidth: 30,
                 order: false,
+                format: (value: Boolean) => String(value),
             },
             {
                 id: 'office',
@@ -164,6 +168,7 @@ export const ProductTable: React.FC = () => {
                 hidden: true,
                 minWidth: 30,
                 order: false,
+                format: (value: Boolean) => String(value),
             },
             {
                 id: 'upc',
@@ -338,10 +343,7 @@ export const ProductTable: React.FC = () => {
 
     function handleToggleCheckbox(column: Column): void {
         column.hidden = !column.hidden;
-        // const newColumns = columns;
-        // const columnsIndex = newColumns.indexOf(column);
-        // newColumns[columnsIndex].hidden = !newColumns[columnsIndex].hidden
-        // setColumns(newColumns);
+        fetchProducts();
     }
 
     function handleChangePage(event: React.MouseEvent<HTMLButtonElement, MouseEvent> | null, newPage: number) {
@@ -368,7 +370,7 @@ export const ProductTable: React.FC = () => {
 
     return (
         <div>
-            <AppBar position="static" >
+            <AppBar position="static">
                 <Toolbar>
                     <Button variant="contained" color="secondary" onClick={handleOpenColumnDialog}>
                         Columns
@@ -399,7 +401,7 @@ export const ProductTable: React.FC = () => {
                 handleCloseColumnDialog={handleCloseColumnDialog}
             />
             <TableContainer>
-                <Table stickyHeader aria-label="sticky table">
+                <Table stickyHeader>
                     <TableHead>
                         <TableRow>
                             {columns
@@ -439,7 +441,7 @@ export const ProductTable: React.FC = () => {
                                                 return (
                                                     <TableCell key={product.asin + column.id} align={column.align}>
                                                         {column.format && value
-                                                            ? column.format(value)
+                                                            ? (column.format(value) === "true" ? <CheckIcon/>:value)
                                                             : value}
                                                     </TableCell>
                                                 );
@@ -459,6 +461,7 @@ export const ProductTable: React.FC = () => {
                 onChangePage={handleChangePage}
                 onChangeRowsPerPage={handleChangeRowsPerPage}
             />
+
         </div>
     );
 
