@@ -38,3 +38,6 @@ out/
 bin/
 logs/
 log/
+
+### dev ###
+src/main/resources/application-dev.properties

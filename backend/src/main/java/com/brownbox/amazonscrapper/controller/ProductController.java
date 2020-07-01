@@ -22,9 +22,13 @@ public class ProductController {
 
    @GetMapping("/products")
    public Page<Product> searchProducts(Pageable pageable, String searchTerms){
+       if (searchTerms == null) {
+           return productRepository.findAll(pageable);
+       }
+
        searchTerms = searchTerms.toLowerCase().trim();
 
-       if (searchTerms == null || searchTerms == "") {
+       if (searchTerms.isEmpty()) {
             return productRepository.findAll(pageable);
        }
 
@@ -52,10 +56,13 @@ public class ProductController {
        }
 
        if (result.size() == 0) {
-           throw  new ResourceNotFoundException("No Matching Keyword(" + searchTerms + ") Products Found!");
+           throw new ResourceNotFoundException("No Matching Keyword(" + searchTerms + ") Products Found!");
        }
 
-       final Page<Product> page = new PageImpl<>(result, pageable, result.size());
+       long startIndex = pageable.getOffset();
+       long endIndex = Math.min((startIndex + pageable.getPageSize()), result.size());
+
+       final Page<Product> page = new PageImpl<>(result.subList((int)startIndex, (int)endIndex), pageable, result.size());
 
        return page;
    }
