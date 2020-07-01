@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Product, Column } from '../../common/types';
 import axios from 'axios';
 import { ColumnDialog } from './column-dialog.component';
@@ -49,13 +49,13 @@ export const ProductTable: React.FC = () => {
                 id: 'id',
                 label: 'ID',
                 hidden: false,
-                minWidth: 150,
+                minWidth: 100,
                 order: 'desc'
             },
             {
                 id: 'price',
                 label: 'Price',
-                hidden: true,
+                hidden: false,
                 minWidth: 100,
                 order: false,
                 format: (value: number) => value.toFixed(2),
@@ -96,13 +96,6 @@ export const ProductTable: React.FC = () => {
                 order: false,
             },
             {
-                id: 'vc',
-                label: 'Video Card',
-                hidden: false,
-                minWidth: 150,
-                order: false,
-            },
-            {
                 id: 'ram',
                 label: 'RAM',
                 hidden: false,
@@ -110,29 +103,36 @@ export const ProductTable: React.FC = () => {
                 order: false,
             },
             {
-                id: 'hhd',
-                label: 'HHD',
-                hidden: false,
-                minWidth: 150,
-                order: false,
-            },
-            {
-                id: 'ssd',
-                label: 'SSD',
-                hidden: false,
-                minWidth: 150,
-                order: false,
-            },
-            {
                 id: 'type',
-                label: 'Type',
-                hidden: true,
+                label: 'Category',
+                hidden: false,
                 minWidth: 150,
                 order: false,
             },
             {
                 id: 'screen',
                 label: 'Screen',
+                hidden: false,
+                minWidth: 150,
+                order: false,
+            },
+            {
+                id: 'vc',
+                label: 'Video Card',
+                hidden: true,
+                minWidth: 150,
+                order: false,
+            },
+            {
+                id: 'hhd',
+                label: 'HHD',
+                hidden: true,
+                minWidth: 150,
+                order: false,
+            },
+            {
+                id: 'ssd',
+                label: 'SSD',
                 hidden: true,
                 minWidth: 150,
                 order: false,
@@ -203,6 +203,8 @@ export const ProductTable: React.FC = () => {
 
     const ItemsCountPerPage = [10, 25, 50, 100];
 
+    const searchInputRef = useRef<HTMLInputElement>(null);
+
     const classes = useStyles();
 
     useEffect(() => {
@@ -228,7 +230,11 @@ export const ProductTable: React.FC = () => {
                 setProducts(response.data.content);
                 setTotalItemsCount(response.data.totalElements);
             })
-            .catch(err => console.log(err))
+            .catch((err: Error) => {
+                console.log(err);
+                setProducts([]);
+                setTotalItemsCount(0);
+            });
     };
 
     function getValueFromProduct(product: Product, prop: string): any {
@@ -354,13 +360,9 @@ export const ProductTable: React.FC = () => {
         setshowColumnDialog(false);
     }
 
-    function handleSearchChange(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
-        setSearchTerms(event.target.value);
-    }
-
     function handleSearchEnterPress(event: React.KeyboardEvent<HTMLDivElement>) {
         if (event.key === "Enter"){
-            console.log(searchTerms);
+            setSearchTerms(searchInputRef.current ? searchInputRef.current?.value : "");
         }
     }
 
@@ -377,13 +379,14 @@ export const ProductTable: React.FC = () => {
                         </div>
                         <Input
                             type="text"
-                            placeholder="Search Product Here…"
+                            fullWidth={true}
+                            inputRef={searchInputRef}
+                            placeholder="Search Products by Brand, Model, Screen, CPU, RAM or Category..."
                             classes={{
                                 root: classes.inputRoot,
                                 input: classes.inputInput,
                             }}
                             inputProps={{ 'aria-label': 'search products' }}
-                            onChange={handleSearchChange}
                             onKeyPress={handleSearchEnterPress}
                         />
                     </div>
